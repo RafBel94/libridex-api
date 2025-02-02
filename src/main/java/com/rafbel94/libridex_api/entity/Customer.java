@@ -17,6 +17,9 @@ import lombok.ToString;
 @NoArgsConstructor
 @AllArgsConstructor
 public class Customer {
+
+    // THIS CLASS IS FOR TESTING AND GUIDING PURPOSES, IT'S NOT PART OF THE PROJECT TASKS
+    
     @Id
     @GeneratedValue(strategy=GenerationType.AUTO)
     private int id;

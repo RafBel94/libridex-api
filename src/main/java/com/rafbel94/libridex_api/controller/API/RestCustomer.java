@@ -21,7 +21,9 @@ import com.rafbel94.libridex_api.service.CustomerService;
 @RestController
 @RequestMapping("/api")
 public class RestCustomer {
-
+    
+    // THIS CLASS IS FOR TESTING AND GUIDING PURPOSES, IT'S NOT PART OF THE PROJECT TASKS
+    
     @Autowired
     @Qualifier("customerService")
     private CustomerService customerService;
