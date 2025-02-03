@@ -16,4 +16,5 @@ public interface BookService {
     BookDTO toDTO(Book book);
     Book toEntity(BookDTO bookDTO);
     Book toEntity(BookUpdateDTO bookUpdateDTO);
+    boolean isRequestBodyEmpty(BookUpdateDTO bookUpdateDTO);
 }

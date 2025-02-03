@@ -52,6 +52,12 @@ public class RestBook {
         bookUpdateDTO.setId(id);
         List<String> errors = bookService.validateBookUpdate(bookUpdateDTO);
         Map<String, Object> response = new HashMap<>();
+
+        if (bookService.isRequestBodyEmpty(bookUpdateDTO)){
+            response.put("errors", "Request body must not be empty");
+            return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
+        }
+
         if (!errors.isEmpty()) {
             response.put("errors", errors);
             return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);

@@ -67,14 +67,24 @@ public class BookServiceImpl implements BookService {
             return errors;
         }
         if (bookUpdateDTO.getTitle() != null) {
-            if (bookRepository.findByTitle(bookUpdateDTO.getTitle()) != null) {
+            if (bookRepository.findByTitleAndNotId(bookUpdateDTO.getTitle(), bookUpdateDTO.getId()) != null) {
                 errors.add("There's already a book with that title");
                 return errors;
             }
-        } else if (!bookUpdateDTO.getImage().startsWith("http://") && !bookUpdateDTO.getImage().startsWith("https://"))
-            errors.add("The image must be a valid URL");
+        } else if (bookUpdateDTO.getPublishingDate() != null)
+            if (!bookUpdateDTO.getImage().startsWith("http://")
+                    && !bookUpdateDTO.getImage().startsWith("https://"))
+                errors.add("The image must be a valid URL");
 
         return errors;
+    }
+
+    @Override
+    public boolean isRequestBodyEmpty(BookUpdateDTO bookUpdateDTO) {
+        return (bookUpdateDTO.getTitle() == null &&
+                bookUpdateDTO.getAuthor() == null &&
+                bookUpdateDTO.getGenre() == null &&
+                bookUpdateDTO.getPublishingDate() == null);
     }
 
     // MODEL MAPPERS
