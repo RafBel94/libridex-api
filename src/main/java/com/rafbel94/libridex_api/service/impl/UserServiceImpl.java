@@ -1,5 +1,6 @@
 package com.rafbel94.libridex_api.service.impl;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,6 +14,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import com.rafbel94.libridex_api.entity.User;
+import com.rafbel94.libridex_api.model.UserRegisterDTO;
 import com.rafbel94.libridex_api.repository.UserRepository;
 import com.rafbel94.libridex_api.service.UserService;
 
@@ -65,6 +67,18 @@ public class UserServiceImpl implements UserService, UserDetailsService {
     @Override
     public List<User> findAllUsers() {
         return userRepository.findAll();
+    }
+
+    // Validates user and returns a List<String> containing found errors
+    @Override
+    public List<String> validateUser(UserRegisterDTO user) {
+        List<String> errors = new ArrayList<>();
+        if(!user.getPassword().matches(user.getRepeatPassword()))
+            errors.add("The passwords doesn't match");
+        else if(userRepository.findByEmail(user.getEmail()) !=null)
+            errors.add("The email is already being used");
+
+        return errors;
     }
 
 }
