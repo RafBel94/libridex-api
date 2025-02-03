@@ -30,7 +30,7 @@ public class BookServiceImpl implements BookService {
         LocalDate afterPublishingDateParsed = afterPublishingDate != null ? LocalDate.parse(afterPublishingDate) : null;
 
         String[] sortOptions = sortBy.split("_");
-        return bookRepository.findAllWithFilters(genres, authors, beforePublishingDateParsed, afterPublishingDateParsed, sortOptions[0], sortOptions[1]);
+        return bookRepository.findAllWithFilters(genres, authors, beforePublishingDateParsed, afterPublishingDateParsed);
     }
 
     @Override
