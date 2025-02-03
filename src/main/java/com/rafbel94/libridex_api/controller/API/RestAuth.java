@@ -1,6 +1,5 @@
 package com.rafbel94.libridex_api.controller.API;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -9,14 +8,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.rafbel94.libridex_api.entity.User;
+import com.rafbel94.libridex_api.model.UserLoginDTO;
 import com.rafbel94.libridex_api.model.UserRegisterDTO;
 import com.rafbel94.libridex_api.service.UserService;
 import com.rafbel94.libridex_api.util.TokenUtils;
@@ -42,18 +40,23 @@ public class RestAuth {
      *         authentication fails
      */
     @PostMapping("/login")
-    public ResponseEntity<Map<String, Object>> login(@RequestParam String email, @RequestParam String password) {
-        User user = userService.findByEmail(email);
+    public ResponseEntity<Map<String, Object>> login(@Valid @RequestBody UserLoginDTO userLoginDTO) {
+        List<String> errors = userService.validateLogin(userLoginDTO);
 
-        if (user == null || !new BCryptPasswordEncoder().matches(password, user.getPassword())) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(Map.of("error", "Wrong credentials"));
+        if (!errors.isEmpty()) {
+            Map<String, Object> response = new HashMap<>();
+
+            response.put("errors", errors);
+            return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
         }
+        
+        User user = userService.findByEmail(userLoginDTO.getEmail());
 
         String token = TokenUtils.getJWTToken(user.getEmail());
+        userService.updateUserToken(token, user);
 
         Map<String, Object> response = new HashMap<>();
         response.put("email", user.getEmail());
-        response.put("role", user.getRole());
         response.put("token", token);
 
         return ResponseEntity.ok(response);
@@ -67,15 +70,19 @@ public class RestAuth {
      * @return the registered user object
      */
     @PostMapping("/register")
-    public ResponseEntity<?> register(@Valid @RequestBody UserRegisterDTO user) {
+    public ResponseEntity<?> register(@RequestBody UserRegisterDTO user) {
         List<String> errors = userService.validateUser(user);
         if (!errors.isEmpty()) {
             Map<String, Object> response = new HashMap<>();
+
             response.put("errors", errors);
             return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
         }
 
-        User registeredUser = userService.addUser(userService.toEntity(user));
-        return new ResponseEntity<>(registeredUser, HttpStatus.CREATED);
+        userService.registerUser(userService.toEntity(user));
+
+        Map<String, Object> response = new HashMap<>();
+        response.put("message", "User registered succesfully");
+        return new ResponseEntity<>(response, HttpStatus.CREATED);
     }
 }

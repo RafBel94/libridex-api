@@ -2,6 +2,7 @@ package com.rafbel94.libridex_api.util;
 
 import java.security.Key;
 import java.util.Date;
+import java.util.UUID;
 
 import io.jsonwebtoken.Jwts;
 
@@ -20,6 +21,7 @@ public class TokenUtils {
 
         return Jwts.builder()
                 .subject(email)
+                .claim("uuid", UUID.randomUUID().toString())
                 .issuedAt(new Date())
                 .expiration(new Date(System.currentTimeMillis() + expirationTime))
                 .signWith(key)

@@ -40,7 +40,7 @@ public class AuthController {
     
     @PostMapping("/register")
     public String registerUser(@ModelAttribute("user") User user, RedirectAttributes flashAttributes) {
-        userService.addUser(user);
+        userService.registerUser(user);
         flashAttributes.addFlashAttribute("success", "Registered successfully!");
         return LOGIN_VIEW;
     }
