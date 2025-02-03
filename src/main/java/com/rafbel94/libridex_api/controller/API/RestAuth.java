@@ -70,8 +70,8 @@ public class RestAuth {
      * @return the registered user object
      */
     @PostMapping("/register")
-    public ResponseEntity<?> register(@RequestBody UserRegisterDTO user) {
-        List<String> errors = userService.validateUser(user);
+    public ResponseEntity<?> register(@Valid @RequestBody UserRegisterDTO user) {
+        List<String> errors = userService.validateRegister(user);
         if (!errors.isEmpty()) {
             Map<String, Object> response = new HashMap<>();
 

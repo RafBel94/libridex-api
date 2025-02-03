@@ -12,6 +12,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.BindingResult;
 
@@ -78,42 +79,31 @@ public class UserServiceImpl implements UserService, UserDetailsService {
         return userRepository.findAll();
     }
 
-    // Validates user and returns a List<String> containing found errors
-    @Override
-    public List<String> validateUser(UserRegisterDTO user) {
-        List<String> errors = new ArrayList<>();
-        if (!user.getPassword().matches(user.getRepeatPassword()))
-            errors.add("The passwords doesn't match");
-        if (user.getPassword().isBlank() || user.getRepeatPassword().isBlank())
-            errors.add("The password and repeat password fields are mandatory");
-        if (userRepository.findByEmail(user.getEmail()) != null)
-            errors.add("The email is already being used");
-        if (!user.getEmail().matches("^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+$"))
-            errors.add("The email format is invalid");
-        if (user.getEmail().isBlank())
-            errors.add("The email is mandatory");
-        return errors;
-    }
-
+    // Validates the login looking for non existent accouont or wrong passwords
     @Override
     public List<String> validateLogin(UserLoginDTO userLoginDTO) {
         List<String> errors = new ArrayList<>();
-        if (userLoginDTO.getEmail().isBlank())
-            errors.add("The email is mandatory");
-        if (userLoginDTO.getPassword().isBlank())
-            errors.add("The password is mandatory");
-
-        if (!errors.isEmpty())
-            return errors;
-
-        if (findByEmail(userLoginDTO.getEmail()) == null){
-            errors.add("Theres no users with that email");
-            return errors;
-        } else if (!new BCryptPasswordEncoder().matches(userLoginDTO.getPassword(), findByEmail(userLoginDTO.getEmail()).getPassword()))
+        User user = userRepository.findByEmail(userLoginDTO.getEmail());
+        if (user == null) {
+            errors.add("There's no account with that email");
+        } else if (!new BCryptPasswordEncoder().matches(userLoginDTO.getPassword(), user.getPassword())) {
             errors.add("Wrong credentials");
-        
+        }
         return errors;
     }
+
+    // Validates user and returns a List<String> containing found errors
+    @Override
+    public List<String> validateRegister(UserRegisterDTO user) {
+        List<String> errors = new ArrayList<>();
+        if (userRepository.findByEmail(user.getEmail()) != null)
+            errors.add("The email is already being used");
+        else if (!user.getPassword().matches(user.getRepeatPassword()))
+            errors.add("The passwords doesn't match");
+        return errors;
+    }
+
+    
 
     // MODEL MAPPERS
     @Override

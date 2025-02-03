@@ -13,7 +13,7 @@ public interface UserService {
     void updateUserToken(String token, User user);
     void deleteUserById(Integer id);
     List<User> findAllUsers();
-    List<String> validateUser(UserRegisterDTO user);
+    List<String> validateRegister(UserRegisterDTO user);
     List<String> validateLogin(UserLoginDTO user);
     UserRegisterDTO toRegisterDTO(User user);
     User toEntity(UserRegisterDTO userRegisterDTO);
