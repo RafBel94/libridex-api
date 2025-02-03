@@ -1,6 +1,8 @@
 package com.rafbel94.libridex_api.controller.API;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,6 +17,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.rafbel94.libridex_api.entity.User;
+import com.rafbel94.libridex_api.model.UserRegisterDTO;
 import com.rafbel94.libridex_api.service.UserService;
 import com.rafbel94.libridex_api.util.TokenUtils;
 
@@ -61,7 +64,8 @@ public class RestAuth {
      * @return the registered user object
      */
     @PostMapping("/register")
-    public User register(@RequestBody User user) {
+    public User register(@RequestBody UserRegisterDTO user) {
+        // Implement model transform
         return userService.addUser(user);
     }
 }
