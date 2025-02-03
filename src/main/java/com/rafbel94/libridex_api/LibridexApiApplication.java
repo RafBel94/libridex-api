@@ -9,5 +9,4 @@ public class LibridexApiApplication {
 	public static void main(String[] args) {
 		SpringApplication.run(LibridexApiApplication.class, args);
 	}
-
 }
