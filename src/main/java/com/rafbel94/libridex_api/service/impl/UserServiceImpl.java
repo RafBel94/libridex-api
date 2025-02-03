@@ -3,6 +3,7 @@ package com.rafbel94.libridex_api.service.impl;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -79,6 +80,21 @@ public class UserServiceImpl implements UserService, UserDetailsService {
             errors.add("The email is already being used");
 
         return errors;
+    }
+
+
+
+    // MODEL MAPPERS
+    @Override
+    public UserRegisterDTO toRegisterDTO(User user) {
+        ModelMapper mapper = new ModelMapper();
+        return mapper.map(user, UserRegisterDTO.class);
+    }
+
+    @Override
+    public User toEntity(UserRegisterDTO userRegisterDTO) {
+        ModelMapper mapper = new ModelMapper();
+        return mapper.map(userRegisterDTO, User.class);
     }
 
 }

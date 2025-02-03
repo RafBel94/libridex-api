@@ -21,6 +21,8 @@ import com.rafbel94.libridex_api.model.UserRegisterDTO;
 import com.rafbel94.libridex_api.service.UserService;
 import com.rafbel94.libridex_api.util.TokenUtils;
 
+import jakarta.validation.Valid;
+
 @RestController
 @RequestMapping("api/auth")
 public class RestAuth {
@@ -60,12 +62,20 @@ public class RestAuth {
     /**
      * Registers a new user with the provided user details.
      *
-     * @param user the user object containing the details of the user to be registered
+     * @param user the user object containing the details of the user to be
+     *             registered
      * @return the registered user object
      */
     @PostMapping("/register")
-    public User register(@RequestBody UserRegisterDTO user) {
-        // Implement model transform
-        return userService.addUser(user);
+    public ResponseEntity<?> register(@Valid @RequestBody UserRegisterDTO user) {
+        List<String> errors = userService.validateUser(user);
+        if (!errors.isEmpty()) {
+            Map<String, Object> response = new HashMap<>();
+            response.put("errors", errors);
+            return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
+        }
+
+        User registeredUser = userService.addUser(userService.toEntity(user));
+        return new ResponseEntity<>(registeredUser, HttpStatus.CREATED);
     }
 }

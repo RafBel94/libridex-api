@@ -12,4 +12,6 @@ public interface UserService {
     void deleteUserById(Integer id);
     List<User> findAllUsers();
     List<String> validateUser(UserRegisterDTO user);
+    UserRegisterDTO toRegisterDTO(User user);
+    User toEntity(UserRegisterDTO userRegisterDTO);
 }
