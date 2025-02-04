@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -24,7 +25,6 @@ import com.rafbel94.libridex_api.model.BookUpdateDTO;
 import com.rafbel94.libridex_api.service.BookService;
 
 import jakarta.validation.Valid;
-import org.springframework.web.bind.annotation.RequestParam;
 
 
 @RestController
@@ -36,9 +36,14 @@ public class RestBook {
     private BookService bookService;
 
     @PostMapping("")
-    public ResponseEntity<?> addBook(@Valid @RequestBody BookDTO bookDTO) {
-        List<String> errors = bookService.validateBookCreation(bookDTO);
+    public ResponseEntity<?> addBook(@RequestHeader("Authorization") String token, @Valid @RequestBody BookDTO bookDTO) {
         Map<String, Object> response = new HashMap<>();
+        if (token == null){
+            response.put("error", "An authentication token is mandatory");
+            return new ResponseEntity<>(response, HttpStatus.FORBIDDEN);
+        } 
+
+        List<String> errors = bookService.validateBookCreation(bookDTO);
         if (!errors.isEmpty()) {
             response.put("errors", errors);
             return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
@@ -50,10 +55,15 @@ public class RestBook {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<?> updateBook(@PathVariable Integer id, @Valid @RequestBody BookUpdateDTO bookUpdateDTO) {
+    public ResponseEntity<?> updateBook(@RequestHeader("Authorization") String token, @PathVariable Integer id, @Valid @RequestBody BookUpdateDTO bookUpdateDTO) {
+        Map<String, Object> response = new HashMap<>();
+        if (token == null){
+            response.put("error", "An authentication token is mandatory");
+            return new ResponseEntity<>(response, HttpStatus.FORBIDDEN);
+        } 
+
         bookUpdateDTO.setId(id);
         List<String> errors = bookService.validateBookUpdate(bookUpdateDTO);
-        Map<String, Object> response = new HashMap<>();
 
         if (!errors.isEmpty()) {
             response.put("errors", errors);
@@ -66,7 +76,13 @@ public class RestBook {
     }
 
     @GetMapping("")
-    public ResponseEntity<?> getAllBooks() {
+    public ResponseEntity<?> getAllBooks(@RequestHeader("Authorization") String token) {
+        Map<String, Object> response = new HashMap<>();
+        if (token == null){
+            response.put("error", "An authentication token is mandatory");
+            return new ResponseEntity<>(response, HttpStatus.FORBIDDEN);
+        } 
+
         List<Book> books = bookService.getAllBooks();
 
         if (books.isEmpty())
@@ -76,7 +92,14 @@ public class RestBook {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<?> getMethodName(@PathVariable Integer id) {
+    public ResponseEntity<?> getBook(@RequestHeader("Authorization") String token, @PathVariable Integer id) {
+        Map<String, Object> response = new HashMap<>();
+        System.out.println(token);
+        if (token == null){
+            response.put("error", "An authentication token is mandatory");
+            return new ResponseEntity<>(response, HttpStatus.FORBIDDEN);
+        } 
+
         Book book = bookService.findById(id);
         if (book == null)
             return ResponseEntity.notFound().build();
@@ -85,9 +108,14 @@ public class RestBook {
     
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<?> deleteBook(@PathVariable Integer id) {
-        Book book = bookService.findById(id);
+    public ResponseEntity<?> deleteBook(@RequestHeader("Authorization") String token, @PathVariable Integer id) {
         Map<String, Object> response = new HashMap<>();
+        if (token == null){
+            response.put("error", "An authentication token is mandatory");
+            return new ResponseEntity<>(response, HttpStatus.FORBIDDEN);
+        } 
+
+        Book book = bookService.findById(id);
         if (book != null) {
             bookService.deleteById(id);
             response.put("message", "Book deleted successfully");
