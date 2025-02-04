@@ -286,8 +286,6 @@ public class BookServiceImpl implements BookService {
             existingBook.setPublishingDate(bookUpdateDTO.getPublishingDate());
         }
 
-        existingBook.setLent(bookUpdateDTO.isLent());
-
         return existingBook;
     }
 }

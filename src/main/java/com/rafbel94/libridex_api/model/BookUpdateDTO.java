@@ -23,6 +23,4 @@ public class BookUpdateDTO {
 
     @PastOrPresent(message = "The date must be one before today")
     private LocalDate publishingDate;
-
-    boolean lent;
 }

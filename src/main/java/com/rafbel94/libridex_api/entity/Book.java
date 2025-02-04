@@ -34,9 +34,6 @@ public class Book {
     @Column(nullable = false)
     private LocalDateTime createdAt;
 
-    @Column(nullable = false)
-    private boolean lent;
-
     public Book() {
     }
 
@@ -48,7 +45,6 @@ public class Book {
         this.genre = genre;
         this.publishingDate = publishingDate;
         this.createdAt = createdAt;
-        this.lent = lent;
     }
 
     public Integer getId() {
@@ -107,17 +103,9 @@ public class Book {
         this.createdAt = createdAt;
     }
 
-    public boolean isLent() {
-        return lent;
-    }
-
-    public void setLent(boolean lent) {
-        this.lent = lent;
-    }
-
     @Override
     public String toString() {
         return "Book [author=" + author + ", createdAt=" + createdAt + ", genre=" + genre + ", id=" + id + ", image="
-                + image + ", lent=" + lent + ", publishingDate=" + publishingDate + ", title=" + title + "]";
+                + image + ", publishingDate=" + publishingDate + ", title=" + title + "]";
     }
 }
