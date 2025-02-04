@@ -48,6 +48,7 @@ public class BookServiceImpl implements BookService {
     @Override
     public List<String> validateBookCreation(BookDTO bookDTO) {
         List<String> errors = new ArrayList<>();
+
         if (bookRepository.findByTitle(bookDTO.getTitle()) != null) {
             errors.add("There's already a book with that title");
             return errors;
@@ -62,10 +63,17 @@ public class BookServiceImpl implements BookService {
     public List<String> validateBookUpdate(BookUpdateDTO bookUpdateDTO) {
         Book book = bookRepository.findById(bookUpdateDTO.getId()).orElse(null);
         List<String> errors = new ArrayList<>();
+
+        if (isRequestBodyEmpty(bookUpdateDTO)){
+            errors.add("Request body must not be empty");
+            return errors;
+        }
+
         if (book == null) {
             errors.add("There's no book with that id");
             return errors;
         }
+
         if (bookUpdateDTO.getTitle() != null) {
             if (bookRepository.findByTitleAndNotId(bookUpdateDTO.getTitle(), bookUpdateDTO.getId()) != null) {
                 errors.add("There's already a book with that title");

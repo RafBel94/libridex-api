@@ -24,6 +24,8 @@ import com.rafbel94.libridex_api.model.BookUpdateDTO;
 import com.rafbel94.libridex_api.service.BookService;
 
 import jakarta.validation.Valid;
+import org.springframework.web.bind.annotation.RequestParam;
+
 
 @RestController
 @RequestMapping("/api/books")
@@ -53,11 +55,6 @@ public class RestBook {
         List<String> errors = bookService.validateBookUpdate(bookUpdateDTO);
         Map<String, Object> response = new HashMap<>();
 
-        if (bookService.isRequestBodyEmpty(bookUpdateDTO)){
-            response.put("errors", "Request body must not be empty");
-            return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
-        }
-
         if (!errors.isEmpty()) {
             response.put("errors", errors);
             return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
@@ -77,6 +74,15 @@ public class RestBook {
 
         return ResponseEntity.ok(books);
     }
+
+    @GetMapping("/{id}")
+    public ResponseEntity<?> getMethodName(@PathVariable Integer id) {
+        Book book = bookService.findById(id);
+        if (book == null)
+            return ResponseEntity.notFound().build();
+        return ResponseEntity.ok(book);
+    }
+    
 
     @DeleteMapping("/{id}")
     public ResponseEntity<?> deleteBook(@PathVariable Integer id) {
