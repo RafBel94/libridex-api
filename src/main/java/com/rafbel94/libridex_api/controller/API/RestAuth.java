@@ -16,8 +16,8 @@ import org.springframework.web.bind.annotation.RestController;
 import com.rafbel94.libridex_api.entity.User;
 import com.rafbel94.libridex_api.model.UserLoginDTO;
 import com.rafbel94.libridex_api.model.UserRegisterDTO;
+import com.rafbel94.libridex_api.service.TokenService;
 import com.rafbel94.libridex_api.service.UserService;
-import com.rafbel94.libridex_api.util.TokenUtils;
 
 import jakarta.validation.Valid;
 
@@ -28,6 +28,10 @@ public class RestAuth {
     @Autowired
     @Qualifier("userService")
     UserService userService;
+
+    @Autowired
+    @Qualifier("tokenService")
+    private TokenService tokenService;
 
     /**
      * Authenticates a user with the provided email and password.
@@ -52,7 +56,7 @@ public class RestAuth {
         
         User user = userService.findByEmail(userLoginDTO.getEmail());
 
-        String token = TokenUtils.getJWTToken(user.getEmail());
+        String token = tokenService.getJWTToken(user.getEmail());
         userService.updateUserToken(token, user);
 
         Map<String, Object> response = new HashMap<>();
