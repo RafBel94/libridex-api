@@ -127,7 +127,7 @@ public class BookServiceImpl implements BookService {
         }
 
         if (bookUpdateDTO.getTitle() != null) {
-            if (bookRepository.findByTitleAndNotId(bookUpdateDTO.getTitle(), bookUpdateDTO.getId()) != null) {
+            if (bookRepository.findByTitleIgnoreCaseAndNotId(bookUpdateDTO.getTitle(), bookUpdateDTO.getId()) != null) {
                 errors.add("There's already a book with that title");
                 return errors;
             }
