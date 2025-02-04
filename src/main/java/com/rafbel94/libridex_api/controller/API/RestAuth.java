@@ -38,6 +38,8 @@ public class RestAuth {
      *
      * @param email    the email of the user attempting to log in
      * @param password the password of the user attempting to log in
+     * @param userLoginDTO model used to validate login paramethers
+     * @apiNote userLoginDTO attributes are validated through jakarta validations
      * @return a ResponseEntity containing a map with the user's email, role, and a
      *         JWT token valid for 24 hours if authentication is successful,
      *         or an error message and HTTP status 401 (Unauthorized) if
@@ -69,13 +71,13 @@ public class RestAuth {
     /**
      * Registers a new user with the provided user details.
      *
-     * @param user the user object containing the details of the user to be
-     *             registered
+     * @param userRegisterDTO model used to validate register paramethers
+     * @apiNote userRegisterDTO attributes are validated through jakarta validations
      * @return the registered user object
      */
     @PostMapping("/register")
-    public ResponseEntity<?> register(@Valid @RequestBody UserRegisterDTO user) {
-        List<String> errors = userService.validateRegister(user);
+    public ResponseEntity<?> register(@Valid @RequestBody UserRegisterDTO userRegisterDTO) {
+        List<String> errors = userService.validateRegister(userRegisterDTO);
         if (!errors.isEmpty()) {
             Map<String, Object> response = new HashMap<>();
 
@@ -83,7 +85,7 @@ public class RestAuth {
             return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
         }
 
-        userService.registerUser(userService.toEntity(user));
+        userService.registerUser(userService.toEntity(userRegisterDTO));
 
         Map<String, Object> response = new HashMap<>();
         response.put("message", "User registered succesfully");

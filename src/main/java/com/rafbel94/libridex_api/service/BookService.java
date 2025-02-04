@@ -10,6 +10,7 @@ import com.rafbel94.libridex_api.model.BookUpdateDTO;
 
 public interface BookService {
     Book findById(Integer id);
+    Book findByTitle(String title);
     Book addBook(Book book);
     void deleteById(Integer id);
     List<Book> getAllBooks();

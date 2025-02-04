@@ -27,6 +27,13 @@ public class UserServiceImpl implements UserService, UserDetailsService {
     @Qualifier("userRepository")
     UserRepository userRepository;
 
+    /**
+     * Loads the user by their email.
+     *
+     * @param email the email of the user to be loaded
+     * @return the UserDetails of the loaded user
+     * @throws UsernameNotFoundException if the user is not found
+     */
     @Override
     public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
         User user = userRepository.findByEmail(email);
@@ -44,16 +51,34 @@ public class UserServiceImpl implements UserService, UserDetailsService {
         return builder.build();
     }
 
+    /**
+     * Finds a user by their ID.
+     *
+     * @param id the ID of the user to be found
+     * @return the user if found, or null if not found
+     */
     @Override
     public User findById(Integer id) {
         return userRepository.findById(id);
     }
 
+    /**
+     * Finds a user by their email.
+     *
+     * @param email the email of the user to be found
+     * @return the user if found, or null if not found
+     */
     @Override
     public User findByEmail(String email) {
         return userRepository.findByEmail(email);
     }
 
+    /**
+     * Registers a new user.
+     *
+     * @param user the user to be registered
+     * @return the registered user
+     */
     @Override
     public User registerUser(User user) {
         user.setRole("ROLE_USER");
@@ -61,23 +86,44 @@ public class UserServiceImpl implements UserService, UserDetailsService {
         return userRepository.save(user);
     }
 
+    /**
+     * Updates the user's token.
+     *
+     * @param token the new token
+     * @param user  the user whose token is to be updated
+     */
     @Override
     public void updateUserToken(String token, User user) {
         user.setToken(token);
         userRepository.save(user);
     }
 
+    /**
+     * Deletes a user by their ID.
+     *
+     * @param id the ID of the user to be deleted
+     */
     @Override
     public void deleteUserById(Integer id) {
         userRepository.deleteById(id);
     }
 
+    /**
+     * Finds all users.
+     *
+     * @return the list of all users
+     */
     @Override
     public List<User> findAllUsers() {
         return userRepository.findAll();
     }
 
-    // Validates the login looking for non existent accouont or wrong passwords
+    /**
+     * Validates the login data that could not be validated through jakarta validations
+     *
+     * @param userLoginDTO the user login data transfer object containing the login details to be validated
+     * @return the list of validation errors, or an empty list if validation is successful
+     */
     @Override
     public List<String> validateLogin(UserLoginDTO userLoginDTO) {
         List<String> errors = new ArrayList<>();
@@ -90,7 +136,12 @@ public class UserServiceImpl implements UserService, UserDetailsService {
         return errors;
     }
 
-    // Validates user and returns a List<String> containing found errors
+    /**
+     * Validates the registration data that could not be validated through jakarta validations
+     *
+     * @param user the user registration data transfer object containing the registration details to be validated
+     * @return the list of validation errors, or an empty list if validation is successful
+     */
     @Override
     public List<String> validateRegister(UserRegisterDTO user) {
         List<String> errors = new ArrayList<>();
@@ -101,9 +152,8 @@ public class UserServiceImpl implements UserService, UserDetailsService {
         return errors;
     }
 
-    
-
     // MODEL MAPPERS
+
     @Override
     public UserRegisterDTO toRegisterDTO(User user) {
         ModelMapper mapper = new ModelMapper();

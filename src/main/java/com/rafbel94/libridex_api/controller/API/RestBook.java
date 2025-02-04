@@ -48,6 +48,7 @@ public class RestBook {
      * @param token   the authorization token from the request header
      * @param bookDTO the book data transfer object containing the details of the
      *                book to be added
+     * @apiNote bookDTO attributes are validated through jakarta validations
      * @return a ResponseEntity containing the added book details if successful, or
      *         an error message if validation fails
      */
@@ -68,8 +69,8 @@ public class RestBook {
         }
 
         bookDTO.setCreatedAt(LocalDateTime.now());
-        bookService.addBook(bookService.toEntity(bookDTO));
-        return ResponseEntity.ok(bookDTO);
+        Book createdBook = bookService.addBook(bookService.toEntity(bookDTO));
+        return ResponseEntity.status(HttpStatus.CREATED).body(createdBook);
     }
 
     /**
@@ -78,6 +79,7 @@ public class RestBook {
      * @param token          the authorization token from the request header
      * @param id             the ID of the book to be updated
      * @param bookUpdateDTO  the book update data transfer object containing the updated details of the book
+     * @apiNote bookUpdateDTO attributes are validated through jakarta validations
      * @return a ResponseEntity containing the updated book details if successful, or an error message if validation fails
      */
     @PutMapping("/{id}")

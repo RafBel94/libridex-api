@@ -27,11 +27,20 @@ public class TokenServiceImpl implements TokenService {
 
     private SecretKey key;
 
+    /**
+     * Initializes the secret key for JWT token generation and validation.
+     */
     @PostConstruct
     public void init() {
         key = Keys.hmacShaKeyFor(jwtSecretKey.getBytes());
     }
 
+    /**
+     * Validates the provided JWT token.
+     *
+     * @param token the JWT token to be validated
+     * @return a ResponseEntity containing an error message if validation fails, or null if validation is successful
+     */
     @Override
     public ResponseEntity<?> validateToken(String token) {
         if (token == null || !token.startsWith("Bearer ")) {
@@ -61,6 +70,12 @@ public class TokenServiceImpl implements TokenService {
         }
     }
 
+    /**
+     * Generates a JWT token for the provided email.
+     *
+     * @param email the email for which the JWT token is to be generated
+     * @return the generated JWT token
+     */
     @Override
     public String getJWTToken(String email) {
         long expirationTime = 1000 * 60 * 60 * 24;
