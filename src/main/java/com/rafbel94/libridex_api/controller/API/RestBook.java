@@ -9,6 +9,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.BindingResult;
+import org.springframework.validation.MapBindingResult;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -17,6 +19,7 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.rafbel94.libridex_api.entity.Book;
@@ -123,6 +126,24 @@ public class RestBook {
         }
 
         return ResponseEntity.notFound().build();
+    }
+    
+    @GetMapping("/search")
+    public ResponseEntity<?> getBooks(@RequestParam(required = false) List<String> genres,
+            @RequestParam(required = false) List<String> authors, @RequestParam(required = false) String sortBy,
+            @RequestParam(required = false) String beforePublishingDate,
+            @RequestParam(required = false) String afterPublishingDate) {
+
+            BindingResult bindingResult = new MapBindingResult(new HashMap<>(), "bookFilters");
+        if (!bookService.isFindByFiltersValid(genres, authors, sortBy, beforePublishingDate, afterPublishingDate, bindingResult)) {
+            Map<String, String> errors = new HashMap<>();
+            bindingResult.getFieldErrors().forEach(error -> errors.put(error.getField(), error.getDefaultMessage()));
+            return ResponseEntity.unprocessableEntity().body(errors);
+        }
+        List<Book> books = bookService.findByFilters(genres, authors, sortBy, beforePublishingDate, afterPublishingDate);
+        if (books.isEmpty())
+            return ResponseEntity.notFound().build();
+        return ResponseEntity.ok(books);
     }
 
 }
