@@ -113,16 +113,9 @@ public class RestBook {
      */
     @GetMapping("")
     public ResponseEntity<?> getAllBooks(@RequestHeader("Authorization") String token) {
-        Map<String, Object> response = new HashMap<>();
-
         ResponseEntity<?> validationResponse = tokenService.validateToken(token);
         if (validationResponse != null) {
             return validationResponse;
-        }
-
-        if (token == null) {
-            response.put("error", "An authentication token is mandatory");
-            return new ResponseEntity<>(response, HttpStatus.FORBIDDEN);
         }
 
         List<Book> books = bookService.getAllBooks();
