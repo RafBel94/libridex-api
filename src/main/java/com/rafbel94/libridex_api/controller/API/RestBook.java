@@ -17,7 +17,6 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -26,7 +25,6 @@ import com.rafbel94.libridex_api.entity.Book;
 import com.rafbel94.libridex_api.model.BookDTO;
 import com.rafbel94.libridex_api.model.BookUpdateDTO;
 import com.rafbel94.libridex_api.service.BookService;
-import com.rafbel94.libridex_api.service.TokenService;
 
 import jakarta.validation.Valid;
 
@@ -38,14 +36,9 @@ public class RestBook {
     @Qualifier("bookService")
     private BookService bookService;
 
-    @Autowired
-    @Qualifier("tokenService")
-    private TokenService tokenService;
-
     /**
      * Adds a new book to the system.
      *
-     * @param token   the authorization token from the request header
      * @param bookDTO the book data transfer object containing the details of the
      *                book to be added
      * @apiNote bookDTO attributes are validated through jakarta validations
@@ -53,14 +46,8 @@ public class RestBook {
      *         an error message if validation fails
      */
     @PostMapping("")
-    public ResponseEntity<?> addBook(@RequestHeader("Authorization") String token,
-            @Valid @RequestBody BookDTO bookDTO) {
+    public ResponseEntity<?> addBook(@Valid @RequestBody BookDTO bookDTO) {
         Map<String, Object> response = new HashMap<>();
-
-        ResponseEntity<?> validationResponse = tokenService.validateToken(token);
-        if (validationResponse != null) {
-            return validationResponse;
-        }
 
         List<String> errors = bookService.validateBookCreation(bookDTO);
         if (!errors.isEmpty()) {
@@ -76,21 +63,16 @@ public class RestBook {
     /**
      * Updates an existing book in the system.
      *
-     * @param token          the authorization token from the request header
-     * @param id             the ID of the book to be updated
-     * @param bookUpdateDTO  the book update data transfer object containing the updated details of the book
+     * @param id            the ID of the book to be updated
+     * @param bookUpdateDTO the book update data transfer object containing the
+     *                      updated details of the book
      * @apiNote bookUpdateDTO attributes are validated through jakarta validations
-     * @return a ResponseEntity containing the updated book details if successful, or an error message if validation fails
+     * @return a ResponseEntity containing the updated book details if successful,
+     *         or an error message if validation fails
      */
     @PutMapping("/{id}")
-    public ResponseEntity<?> updateBook(@RequestHeader("Authorization") String token, @PathVariable Integer id,
-            @Valid @RequestBody BookUpdateDTO bookUpdateDTO) {
+    public ResponseEntity<?> updateBook(@PathVariable Integer id, @Valid @RequestBody BookUpdateDTO bookUpdateDTO) {
         Map<String, Object> response = new HashMap<>();
-
-        ResponseEntity<?> validationResponse = tokenService.validateToken(token);
-        if (validationResponse != null) {
-            return validationResponse;
-        }
 
         bookUpdateDTO.setId(id);
         List<String> errors = bookService.validateBookUpdate(bookUpdateDTO);
@@ -108,23 +90,11 @@ public class RestBook {
     /**
      * Retrieves all books from the system.
      *
-     * @param token the authorization token from the request header
-     * @return a ResponseEntity containing the list of all books if successful, or an error message if validation fails
+     * @return a ResponseEntity containing the list of all books if successful, or
+     *         an error message if validation fails
      */
     @GetMapping("")
-    public ResponseEntity<?> getAllBooks(@RequestHeader("Authorization") String token) {
-        Map<String, Object> response = new HashMap<>();
-
-        ResponseEntity<?> validationResponse = tokenService.validateToken(token);
-        if (validationResponse != null) {
-            return validationResponse;
-        }
-
-        if (token == null) {
-            response.put("error", "An authentication token is mandatory");
-            return new ResponseEntity<>(response, HttpStatus.FORBIDDEN);
-        }
-
+    public ResponseEntity<?> getAllBooks() {
         List<Book> books = bookService.getAllBooks();
 
         if (books.isEmpty())
@@ -136,17 +106,12 @@ public class RestBook {
     /**
      * Retrieves a specific book by its ID.
      *
-     * @param token the authorization token from the request header
      * @param id    the ID of the book to be retrieved
-     * @return a ResponseEntity containing the book details if found, or an error message if validation fails
+     * @return a ResponseEntity containing the book details if found, or an error
+     *         message if validation fails
      */
     @GetMapping("/{id}")
-    public ResponseEntity<?> getBook(@RequestHeader("Authorization") String token, @PathVariable Integer id) {
-        ResponseEntity<?> validationResponse = tokenService.validateToken(token);
-        if (validationResponse != null) {
-            return validationResponse;
-        }
-
+    public ResponseEntity<?> getBook(@PathVariable Integer id) {
         Book book = bookService.findById(id);
         if (book == null)
             return ResponseEntity.notFound().build();
@@ -156,18 +121,13 @@ public class RestBook {
     /**
      * Deletes a specific book by its ID.
      *
-     * @param token the authorization token from the request header
      * @param id    the ID of the book to be deleted
-     * @return a ResponseEntity containing a success message if the book is deleted, or an error message if validation fails
+     * @return a ResponseEntity containing a success message if the book is deleted,
+     *         or an error message if validation fails
      */
     @DeleteMapping("/{id}")
-    public ResponseEntity<?> deleteBook(@RequestHeader("Authorization") String token, @PathVariable Integer id) {
+    public ResponseEntity<?> deleteBook(@PathVariable Integer id) {
         Map<String, Object> response = new HashMap<>();
-
-        ResponseEntity<?> validationResponse = tokenService.validateToken(token);
-        if (validationResponse != null) {
-            return validationResponse;
-        }
 
         Book book = bookService.findById(id);
         if (book != null) {
@@ -182,25 +142,22 @@ public class RestBook {
     /**
      * Searches for books based on various filters.
      *
-     * @param token                the authorization token from the request header
      * @param genres               the list of genres to filter by (optional)
      * @param authors              the list of authors to filter by (optional)
      * @param sortBy               the field to sort the results by (optional)
-     * @param beforePublishingDate the upper limit for the publishing date filter (optional)
-     * @param afterPublishingDate  the lower limit for the publishing date filter (optional)
-     * @return a ResponseEntity containing the list of books that match the filters if successful, or an error message if validation fails
+     * @param beforePublishingDate the upper limit for the publishing date filter
+     *                             (optional)
+     * @param afterPublishingDate  the lower limit for the publishing date filter
+     *                             (optional)
+     * @return a ResponseEntity containing the list of books that match the filters
+     *         if successful, or an error message if validation fails
      */
     @GetMapping("/search")
-    public ResponseEntity<?> getBooks(@RequestHeader("Authorization") String token,
+    public ResponseEntity<?> getBooks(
             @RequestParam(required = false) List<String> genres,
             @RequestParam(required = false) List<String> authors, @RequestParam(required = false) String sortBy,
             @RequestParam(required = false) String beforePublishingDate,
             @RequestParam(required = false) String afterPublishingDate) {
-
-        ResponseEntity<?> validationResponse = tokenService.validateToken(token);
-        if (validationResponse != null) {
-            return validationResponse;
-        }
 
         BindingResult bindingResult = new MapBindingResult(new HashMap<>(), "bookFilters");
         if (!bookService.isFindByFiltersValid(genres, authors, sortBy, beforePublishingDate, afterPublishingDate,
