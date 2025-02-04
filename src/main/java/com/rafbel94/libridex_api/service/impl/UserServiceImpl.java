@@ -3,6 +3,7 @@ package com.rafbel94.libridex_api.service.impl;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -11,9 +12,12 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.validation.BindingResult;
 
 import com.rafbel94.libridex_api.entity.User;
+import com.rafbel94.libridex_api.model.UserLoginDTO;
 import com.rafbel94.libridex_api.model.UserRegisterDTO;
 import com.rafbel94.libridex_api.repository.UserRepository;
 import com.rafbel94.libridex_api.service.UserService;
@@ -53,10 +57,16 @@ public class UserServiceImpl implements UserService, UserDetailsService {
     }
 
     @Override
-    public User addUser(User user) {
+    public User registerUser(User user) {
         user.setRole("ROLE_USER");
         user.setPassword(new BCryptPasswordEncoder().encode(user.getPassword()));
         return userRepository.save(user);
+    }
+
+    @Override
+    public void updateUserToken(String token, User user) {
+        user.setToken(token);
+        userRepository.save(user);
     }
 
     @Override
@@ -69,16 +79,43 @@ public class UserServiceImpl implements UserService, UserDetailsService {
         return userRepository.findAll();
     }
 
+    // Validates the login looking for non existent accouont or wrong passwords
+    @Override
+    public List<String> validateLogin(UserLoginDTO userLoginDTO) {
+        List<String> errors = new ArrayList<>();
+        User user = userRepository.findByEmail(userLoginDTO.getEmail());
+        if (user == null) {
+            errors.add("There's no account with that email");
+        } else if (!new BCryptPasswordEncoder().matches(userLoginDTO.getPassword(), user.getPassword())) {
+            errors.add("Wrong credentials");
+        }
+        return errors;
+    }
+
     // Validates user and returns a List<String> containing found errors
     @Override
-    public List<String> validateUser(UserRegisterDTO user) {
+    public List<String> validateRegister(UserRegisterDTO user) {
         List<String> errors = new ArrayList<>();
-        if(!user.getPassword().matches(user.getRepeatPassword()))
-            errors.add("The passwords doesn't match");
-        else if(userRepository.findByEmail(user.getEmail()) !=null)
+        if (userRepository.findByEmail(user.getEmail()) != null)
             errors.add("The email is already being used");
-
+        else if (!user.getPassword().matches(user.getRepeatPassword()))
+            errors.add("The passwords doesn't match");
         return errors;
+    }
+
+    
+
+    // MODEL MAPPERS
+    @Override
+    public UserRegisterDTO toRegisterDTO(User user) {
+        ModelMapper mapper = new ModelMapper();
+        return mapper.map(user, UserRegisterDTO.class);
+    }
+
+    @Override
+    public User toEntity(UserRegisterDTO userRegisterDTO) {
+        ModelMapper mapper = new ModelMapper();
+        return mapper.map(userRegisterDTO, User.class);
     }
 
 }
