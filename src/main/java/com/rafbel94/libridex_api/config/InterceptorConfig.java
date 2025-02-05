@@ -3,6 +3,7 @@ package com.rafbel94.libridex_api.config;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.web.servlet.config.annotation.CorsRegistry;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
@@ -20,5 +21,14 @@ public class InterceptorConfig implements WebMvcConfigurer{
         registry.addInterceptor(authorizationInterceptor)
                 .addPathPatterns("/api/**")
                 .excludePathPatterns("/api/auth/login", "/api/auth/register");
+    }
+
+    @Override
+    public void addCorsMappings(@SuppressWarnings("null") CorsRegistry registry) {
+        registry.addMapping("/**")
+                .allowedOrigins("http://localhost:4000")
+                .allowedMethods("GET", "POST", "OPTIONS")
+                .allowedHeaders("*")
+                .allowCredentials(true);
     }
 }
