@@ -36,6 +36,9 @@ POST
 | 401         | Unauthorized request            |
 
 ---
+
+#### Success Example
+![login success](https://i.imgur.com/K4FDyOt.png)
 <br>
 
 ### **Register**
@@ -71,8 +74,10 @@ POST
 |-------------|---------------------------------|
 | 201         | User registered successfully      |
 | 400         | Validation errors               |
-
 ---
+
+#### Success Example
+![register success](https://i.imgur.com/Zmjsz18.png)
 <br>
 
 ## Books Endpoints
@@ -118,6 +123,9 @@ POST
 | 401         | Unauthorized request            |
 
 ---
+
+#### Success Example
+![add book success](https://i.imgur.com/1sg3kgA.png)
 <br>
 
 ### **Update Book**
@@ -163,6 +171,8 @@ PUT
 | 404         | Book not found                  |
 
 ---
+#### Success Example
+![update book success](https://i.imgur.com/ieTAgqE.png)
 <br>
 
 ### **Get All Books**
@@ -188,6 +198,8 @@ GET
 | 401         | Unauthorized request            |
 
 ---
+#### Success Example
+![get all books success](https://i.imgur.com/c9lJbtD.png)
 <br>
 
 ### **Get Book by ID**
@@ -215,6 +227,8 @@ GET
 | 404         | Book not found                  |
 
 ---
+#### Success Example
+![get book by id success](https://i.imgur.com/1TiDacQ.png)
 <br>
 
 ### **Delete Book by ID**
@@ -242,6 +256,8 @@ DELETE
 | 404         | Book not found                  |
 
 ---
+#### Success Example
+![delete book by id success](https://i.imgur.com/DOyUDNx.png)
 <br>
 
 ### **Search Books**
@@ -259,11 +275,23 @@ GET
 | Name                  | Type       | Location  | Required | Description                                |
 |-----------------------|------------|-----------|----------|--------------------------------------------|
 | Authorization         | String     | Header    | Yes      | Bearer token for authentication           |
-| authors               | List       | Params     | No       | List of authors to filter by             |
-| genres                | List       | Params     | No       | List of genres to filter by              |
-| sortBy                | String     | Params     | No       | Field to sort results by                  |
-| beforePublishingDate  | String     | Params     | No       | Upper limit for publishing date filter    |
-| afterPublishingDate   | String     | Params     | No       | Lower limit for publishing date filter    |
+| authors               | List       | Params    | No       | List of authors to filter by              |
+| genres                | List       | Params    | No       | List of genres to filter by               |
+| sortBy                | String     | Params    | No       | Field to sort results by                  |
+| beforePublishingDate  | String     | Params    | No       | Upper limit for publishing date filter    |
+| afterPublishingDate   | String     | Params    | No       | Lower limit for publishing date filter    |
+
+#### Valid `sortBy` Parameters
+- `title_asc`
+- `title_desc`
+- `author_asc`
+- `author_desc`
+- `genre_asc`
+- `genre_desc`
+- `publishingDate_asc`
+- `publishingDate_desc`
+- `createdAt_asc`
+- `createdAt_desc`
 
 #### Request example
 ##### Inside PostMan query params
@@ -281,3 +309,7 @@ afterPublishingDate -> 2023-01-01
 | 200         | Books retrieved successfully    |
 | 401         | Unauthorized request            |
 | 400         | Invalid query parameters        |
+
+---
+#### Success Example
+![search books success](https://i.imgur.com/FnKl5ZD.png)
