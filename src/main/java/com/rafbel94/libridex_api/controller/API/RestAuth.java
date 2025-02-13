@@ -78,16 +78,13 @@ public class RestAuth {
     @PostMapping("/register")
     public ResponseEntity<?> register(@Valid @RequestBody UserRegisterDTO userRegisterDTO) {
         List<String> errors = userService.validateRegister(userRegisterDTO);
+        Map<String, Object> response = new HashMap<>();
         if (!errors.isEmpty()) {
-            Map<String, Object> response = new HashMap<>();
-
             response.put("errors", errors);
             return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
         }
 
         userService.registerUser(userService.toEntity(userRegisterDTO));
-
-        Map<String, Object> response = new HashMap<>();
         response.put("message", "User registered succesfully");
         return new ResponseEntity<>(response, HttpStatus.CREATED);
     }
