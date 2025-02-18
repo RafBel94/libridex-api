@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.rafbel94.libridex_api.entity.AuthResponse;
 import com.rafbel94.libridex_api.entity.User;
 import com.rafbel94.libridex_api.model.UserLoginDTO;
 import com.rafbel94.libridex_api.model.UserRegisterDTO;
@@ -46,24 +47,26 @@ public class RestAuth {
      *         authentication fails
      */
     @PostMapping("/login")
-    public ResponseEntity<Map<String, Object>> login(@Valid @RequestBody UserLoginDTO userLoginDTO) {
-        List<String> errors = userService.validateLogin(userLoginDTO);
+    public ResponseEntity<AuthResponse> login(@Valid @RequestBody UserLoginDTO userLoginDTO) {
+        List<String> messages = userService.validateLogin(userLoginDTO);
+        Map<String, Object> data = new HashMap<>();
 
-        if (!errors.isEmpty()) {
-            Map<String, Object> response = new HashMap<>();
-
-            response.put("errors", errors);
+        if (!messages.isEmpty()) {
+            AuthResponse response = new AuthResponse(false, messages, data);
             return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
         }
         
+        messages.add("User logged in successfully");
+
         User user = userService.findByEmail(userLoginDTO.getEmail());
 
         String token = tokenService.getJWTToken(user.getEmail());
         userService.updateUserToken(token, user);
 
-        Map<String, Object> response = new HashMap<>();
-        response.put("email", user.getEmail());
-        response.put("token", token);
+        data.put("email", user.getEmail());
+        data.put("token", token);
+
+        AuthResponse response = new AuthResponse(true, messages, data);
 
         return ResponseEntity.ok(response);
     }
@@ -76,16 +79,20 @@ public class RestAuth {
      * @return the registered user object
      */
     @PostMapping("/register")
-    public ResponseEntity<?> register(@Valid @RequestBody UserRegisterDTO userRegisterDTO) {
-        List<String> errors = userService.validateRegister(userRegisterDTO);
-        Map<String, Object> response = new HashMap<>();
-        if (!errors.isEmpty()) {
-            response.put("errors", errors);
+    public ResponseEntity<AuthResponse> register(@Valid @RequestBody UserRegisterDTO userRegisterDTO) {
+        List<String> messages = userService.validateRegister(userRegisterDTO);
+        Map<String, Object> data = new HashMap<>();
+        AuthResponse response = null;
+
+        if (!messages.isEmpty()) {
+            response = new AuthResponse(false, messages, data);
             return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
         }
 
         userService.registerUser(userService.toEntity(userRegisterDTO));
-        response.put("message", "User registered succesfully");
+        messages.add("User registered succesfully");
+
+        response = new AuthResponse(true, messages, data);
         return new ResponseEntity<>(response, HttpStatus.CREATED);
     }
 }
