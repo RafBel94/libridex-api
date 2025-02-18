@@ -1,18 +1,19 @@
 package com.rafbel94.libridex_api.util;
 
+import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Map;
+import java.util.List;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
-import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.MissingRequestHeaderException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 import com.fasterxml.jackson.databind.exc.InvalidFormatException;
+import com.rafbel94.libridex_api.entity.AuthResponse;
 
 @RestControllerAdvice
 public class CustomExceptionHandler {
@@ -27,16 +28,16 @@ public class CustomExceptionHandler {
      *         with a BAD_REQUEST (400) HTTP status
      */
     @ExceptionHandler(MethodArgumentNotValidException.class)
-    public ResponseEntity<Map<String, String>> handleValidationExceptions(MethodArgumentNotValidException ex) {
-        Map<String, String> errors = new HashMap<>();
+    public ResponseEntity<AuthResponse> handleValidationExceptions(MethodArgumentNotValidException ex) {
+        List<String> messages = new ArrayList<>();
 
         ex.getBindingResult().getAllErrors().forEach(error -> {
-            String fieldName = ((FieldError) error).getField();
             String errorMessage = error.getDefaultMessage();
-            errors.put(fieldName, errorMessage);
+            messages.add(errorMessage);
         });
 
-        return new ResponseEntity<>(errors, HttpStatus.BAD_REQUEST);
+        AuthResponse response = new AuthResponse(false, messages, new HashMap<>());
+        return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
     }
 
     /**
@@ -52,18 +53,17 @@ public class CustomExceptionHandler {
      *         with a BAD_REQUEST (400) HTTP status
      */
     @ExceptionHandler(HttpMessageNotReadableException.class)
-    public ResponseEntity<Map<String, String>> handleInvalidFormatException(HttpMessageNotReadableException ex) {
-        Map<String, String> errors = new HashMap<>();
+    public ResponseEntity<AuthResponse> handleInvalidFormatException(HttpMessageNotReadableException ex) {
+        List<String> messages = new ArrayList<>();
 
         if (ex.getCause() instanceof InvalidFormatException) {
-            InvalidFormatException invalidFormatException = (InvalidFormatException) ex.getCause();
-            String fieldName = invalidFormatException.getPath().get(0).getFieldName();
-            errors.put(fieldName, "The publishing date must follow the format yyyy-MM-dd");
+            messages.add("The publishing date must follow the format yyyy-MM-dd");
         } else {
-            errors.put("error", "Invalid request body.");
+            messages.add("Invalid request body.");
         }
 
-        return new ResponseEntity<>(errors, HttpStatus.BAD_REQUEST);
+        AuthResponse response = new AuthResponse(false, messages, new HashMap<>());
+        return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
     }
 
     /**
@@ -75,10 +75,11 @@ public class CustomExceptionHandler {
      *         with a BAD_REQUEST (400) HTTP status
      */
     @ExceptionHandler(MissingRequestHeaderException.class)
-    public ResponseEntity<Map<String, String>> handleMissingRequestHeaderException(MissingRequestHeaderException ex) {
-        Map<String, String> errors = new HashMap<>();
-        errors.put("error", "Missing required header: " + ex.getHeaderName());
+    public ResponseEntity<AuthResponse> handleMissingRequestHeaderException(MissingRequestHeaderException ex) {
+        List<String> messages = new ArrayList<>();
+        messages.add("Missing required header: " + ex.getHeaderName());
 
-        return new ResponseEntity<>(errors, HttpStatus.BAD_REQUEST);
+        AuthResponse response = new AuthResponse(false, messages, new HashMap<>());
+        return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
     }
 }

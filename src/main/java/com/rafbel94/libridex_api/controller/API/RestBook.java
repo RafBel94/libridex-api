@@ -1,6 +1,7 @@
 package com.rafbel94.libridex_api.controller.API;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -21,6 +22,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.rafbel94.libridex_api.entity.FetchResponse;
 import com.rafbel94.libridex_api.entity.Book;
 import com.rafbel94.libridex_api.model.BookDTO;
 import com.rafbel94.libridex_api.model.BookUpdateDTO;
@@ -45,19 +47,23 @@ public class RestBook {
      * @return a ResponseEntity containing the added book details if successful, or
      *         an error message if validation fails
      */
-    @PostMapping("")
-    public ResponseEntity<?> addBook(@Valid @RequestBody BookDTO bookDTO) {
-        Map<String, Object> response = new HashMap<>();
+    @PostMapping
+    public ResponseEntity<FetchResponse> addBook(@Valid @RequestBody BookDTO bookDTO) {
+        List<Object> data = new ArrayList<>();
+        List<String> messages = new ArrayList<>();
 
-        List<String> errors = bookService.validateBookCreation(bookDTO);
-        if (!errors.isEmpty()) {
-            response.put("errors", errors);
+        messages = bookService.validateBookCreation(bookDTO);
+        if (!messages.isEmpty()) {
+            FetchResponse response = new FetchResponse(false, messages, data);
             return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
         }
 
+        messages.add("Book created successfully");
+
         bookDTO.setCreatedAt(LocalDateTime.now());
-        Book createdBook = bookService.addBook(bookService.toEntity(bookDTO));
-        return ResponseEntity.status(HttpStatus.CREATED).body(createdBook);
+        data.add(bookService.addBook(bookService.toEntity(bookDTO)));
+        FetchResponse response = new FetchResponse(true, messages, data);
+        return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
     /**
@@ -71,20 +77,24 @@ public class RestBook {
      *         or an error message if validation fails
      */
     @PutMapping("/{id}")
-    public ResponseEntity<?> updateBook(@PathVariable Integer id, @Valid @RequestBody BookUpdateDTO bookUpdateDTO) {
-        Map<String, Object> response = new HashMap<>();
+    public ResponseEntity<FetchResponse> updateBook(@PathVariable Integer id, @Valid @RequestBody BookUpdateDTO bookUpdateDTO) {
+        List<Object> data = new ArrayList<>();
 
         bookUpdateDTO.setId(id);
-        List<String> errors = bookService.validateBookUpdate(bookUpdateDTO);
+        List<String> messages = bookService.validateBookUpdate(bookUpdateDTO);
 
-        if (!errors.isEmpty()) {
-            response.put("errors", errors);
+        if (!messages.isEmpty()) {
+            FetchResponse response = new FetchResponse(false, messages, data);
             return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
         }
 
         bookService.addBook(bookService.toEntity(bookUpdateDTO));
-        Book updatedBook = bookService.findById(id);
-        return ResponseEntity.ok(updatedBook);
+
+        data.add(bookService.findById(id));
+
+        messages.add("Book updated successfully");
+        FetchResponse response = new FetchResponse(true, messages, data);
+        return ResponseEntity.ok(response);
     }
 
     /**
@@ -93,14 +103,24 @@ public class RestBook {
      * @return a ResponseEntity containing the list of all books if successful, or
      *         an error message if validation fails
      */
-    @GetMapping("")
-    public ResponseEntity<?> getAllBooks() {
-        List<Book> books = bookService.getAllBooks();
+    @GetMapping
+    public ResponseEntity<FetchResponse> getAllBooks() {
+        List<Object> data = new ArrayList<>();
+        List<String> messages = new ArrayList<>();
 
-        if (books.isEmpty())
-            return ResponseEntity.notFound().build();
+        for (Book book : bookService.getAllBooks()) {
+            data.add(book);
+        }
 
-        return ResponseEntity.ok(books);
+        if (data.isEmpty()){
+            messages.add("No books found");
+            FetchResponse response = new FetchResponse(false, messages, data);
+            return new ResponseEntity<>(response, HttpStatus.NOT_FOUND);
+        }    
+
+        messages.add("Books retrieved successfully");
+        FetchResponse response = new FetchResponse(true, messages, data);
+        return ResponseEntity.ok(response);
     }
 
     /**
@@ -111,11 +131,21 @@ public class RestBook {
      *         message if validation fails
      */
     @GetMapping("/{id}")
-    public ResponseEntity<?> getBook(@PathVariable Integer id) {
+    public ResponseEntity<FetchResponse> getBook(@PathVariable Integer id) {
+        List<Object> data = new ArrayList<>();
+        List<String> messages = new ArrayList<>();
         Book book = bookService.findById(id);
-        if (book == null)
-            return ResponseEntity.notFound().build();
-        return ResponseEntity.ok(book);
+        
+        if (book == null) {
+            messages.add("Book with id " + id + " not found");
+            FetchResponse response = new FetchResponse(false, messages, data);
+            return new ResponseEntity<>(response, HttpStatus.NOT_FOUND);
+        }
+
+        messages.add("Book retrieved successfully");
+        data.add(book);
+        FetchResponse response = new FetchResponse(true, messages, data);
+        return ResponseEntity.ok(response);
     }
 
     /**
@@ -126,17 +156,21 @@ public class RestBook {
      *         or an error message if validation fails
      */
     @DeleteMapping("/{id}")
-    public ResponseEntity<?> deleteBook(@PathVariable Integer id) {
-        Map<String, Object> response = new HashMap<>();
+    public ResponseEntity<FetchResponse> deleteBook(@PathVariable Integer id) {
+        List<String> messages = new ArrayList<>();
+        List<Object> data = new ArrayList<>();
 
         Book book = bookService.findById(id);
-        if (book != null) {
-            bookService.deleteById(id);
-            response.put("message", "Book deleted successfully");
-            return ResponseEntity.ok(response);
+        if (book == null) {
+            messages.add("Book with id " + id + " not found");
+            FetchResponse response = new FetchResponse(false, messages, data);
+            return new ResponseEntity<>(response, HttpStatus.NOT_FOUND);
         }
-
-        return ResponseEntity.notFound().build();
+        
+        bookService.deleteById(id);
+        messages.add("Book deleted successfully");
+        FetchResponse response = new FetchResponse(true, messages, data);
+        return ResponseEntity.ok(response);
     }
 
     /**
@@ -153,24 +187,39 @@ public class RestBook {
      *         if successful, or an error message if validation fails
      */
     @GetMapping("/search")
-    public ResponseEntity<?> getBooks(
+    public ResponseEntity<FetchResponse> getBooks(
             @RequestParam(required = false) List<String> genres,
             @RequestParam(required = false) List<String> authors, @RequestParam(required = false) String sortBy,
             @RequestParam(required = false) String beforePublishingDate,
             @RequestParam(required = false) String afterPublishingDate) {
 
+        List<String> messages = new ArrayList<>();
+        List<Object> data = new ArrayList<>();
+
         BindingResult bindingResult = new MapBindingResult(new HashMap<>(), "bookFilters");
         if (!bookService.isFindByFiltersValid(genres, authors, sortBy, beforePublishingDate, afterPublishingDate,
                 bindingResult)) {
-            Map<String, String> errors = new HashMap<>();
-            bindingResult.getFieldErrors().forEach(error -> errors.put(error.getField(), error.getDefaultMessage()));
-            return ResponseEntity.unprocessableEntity().body(errors);
+            bindingResult.getFieldErrors().forEach(error -> messages.add(error.getDefaultMessage()));
+            FetchResponse response = new FetchResponse(false, messages, data);
+            return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
         }
+
         List<Book> books = bookService.findByFilters(genres, authors, sortBy, beforePublishingDate,
                 afterPublishingDate);
-        if (books.isEmpty())
-            return ResponseEntity.notFound().build();
-        return ResponseEntity.ok(books);
+
+        for (Book book : books) {
+            data.add(book);
+        }
+
+        if (books.isEmpty()) {
+            messages.add("No books found");
+            FetchResponse response = new FetchResponse(false, messages, data);
+            return new ResponseEntity<>(response, HttpStatus.NOT_FOUND);
+        }
+
+        messages.add("Books retrieved successfully");
+        FetchResponse response = new FetchResponse(true, messages, data);
+        return ResponseEntity.ok(response);
     }
 
 }
