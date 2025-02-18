@@ -23,31 +23,6 @@ public class WebSecurityConfig {
     SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http.csrf(csrf -> csrf.disable()).cors(cors -> cors.configurationSource(corsConfigurationSource()))
         .authorizeHttpRequests((requests) -> requests
-                        .requestMatchers("/", "/api/auth/**").permitAll()
-
-                        // Restrict access to POST, PUT, and DELETE methods of books to ADMIN only
-                        .requestMatchers(HttpMethod.POST, "/api/books").hasRole("ADMIN")
-                        .requestMatchers(HttpMethod.PUT, "/api/books/**").hasRole("ADMIN")
-                        .requestMatchers(HttpMethod.DELETE, "/api/books/**").hasRole("ADMIN")
-
-                        // Allow access to GET methods of books to USER and ADMIN
-                        .requestMatchers(HttpMethod.GET, "/api/books").hasAnyRole("USER", "ADMIN")
-                        .requestMatchers(HttpMethod.GET, "/api/books/**").hasAnyRole("USER", "ADMIN")
-                        .requestMatchers(HttpMethod.GET, "/api/books/search").hasAnyRole("USER", "ADMIN")
-
-                        // Allow Static resources access
-                        .requestMatchers(
-                                "/resources/**",
-                                "/images/**",
-                                "/static/**",
-                                "/css/**",
-                                "/js/**",
-                                "/images/**",
-                                "/vendor/**",
-                                "/fonts/**",
-                                "/webjars/**")
-                        .authenticated()
-
                         .anyRequest().permitAll());
 
         return http.build();
