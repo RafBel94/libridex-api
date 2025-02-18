@@ -26,14 +26,14 @@ public class WebSecurityConfig {
                         .requestMatchers("/", "/api/auth/**").permitAll()
 
                         // Restrict access to POST, PUT, and DELETE methods of books to ADMIN only
-                        .requestMatchers(HttpMethod.POST, "/api/books").hasRole("ADMIN")
-                        .requestMatchers(HttpMethod.PUT, "/api/books/**").hasRole("ADMIN")
-                        .requestMatchers(HttpMethod.DELETE, "/api/books/**").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.POST, "/api/books").hasRole("ROLE_ADMIN")
+                        .requestMatchers(HttpMethod.PUT, "/api/books/**").hasRole("ROLE_ADMIN")
+                        .requestMatchers(HttpMethod.DELETE, "/api/books/**").hasRole("ROLE_ADMIN")
 
                         // Allow access to GET methods of books to USER and ADMIN
-                        .requestMatchers(HttpMethod.GET, "/api/books").hasAnyRole("USER", "ADMIN")
-                        .requestMatchers(HttpMethod.GET, "/api/books/**").hasAnyRole("USER", "ADMIN")
-                        .requestMatchers(HttpMethod.GET, "/api/books/search").hasAnyRole("USER", "ADMIN")
+                        .requestMatchers(HttpMethod.GET, "/api/books").hasAnyRole("ROLE_USER", "ROLE_ADMIN")
+                        .requestMatchers(HttpMethod.GET, "/api/books/**").hasAnyRole("ROLE_USER", "ROLE_ADMIN")
+                        .requestMatchers(HttpMethod.GET, "/api/books/search").hasAnyRole("ROLE_USER", "ROLE_ADMIN")
 
                         // Allow Static resources access
                         .requestMatchers(
@@ -48,16 +48,7 @@ public class WebSecurityConfig {
                                 "/webjars/**")
                         .authenticated()
 
-                        .anyRequest().permitAll())
-                .formLogin((form) -> form
-                        .loginPage("/login")
-                        .usernameParameter("email")
-                        .defaultSuccessUrl("/", true)
-                        .permitAll())
-                .logout((logout) -> logout
-                        .logoutUrl("/logout")
-                        .logoutSuccessUrl("/login?logout")
-                        .permitAll());
+                        .anyRequest().permitAll());
 
         return http.build();
     }
