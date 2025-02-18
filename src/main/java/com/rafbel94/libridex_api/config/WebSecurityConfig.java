@@ -17,8 +17,8 @@ public class WebSecurityConfig {
     SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http.csrf(csrf -> csrf.disable())
         .authorizeHttpRequests((requests) -> requests
-                .requestMatchers("/", "/login", "/register", "/api/**")
-                .permitAll()
+                .requestMatchers("/", "/api/auth/**").permitAll()
+                .requestMatchers("/api/books", "/api/books/**").hasRole("USER")
 
                 // Users allowed accesses
                 // Admin only accesses
@@ -34,7 +34,7 @@ public class WebSecurityConfig {
                         "/vendor/**",
                         "/fonts/**",
                         "/webjars/**")
-                .permitAll()
+                .authenticated()
 
                 // Only allow users to lend, reserve and return.
                 // .requestMatchers("/").hasRole("USER")
