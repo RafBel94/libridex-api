@@ -2,6 +2,7 @@ package com.rafbel94.libridex_api.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
@@ -16,30 +17,33 @@ public class WebSecurityConfig {
     @Bean
     SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http.csrf(csrf -> csrf.disable())
-        .authorizeHttpRequests((requests) -> requests
-                .requestMatchers("/", "/api/auth/**").permitAll()
-                .requestMatchers("/api/books", "/api/books/**").hasRole("USER")
+                .authorizeHttpRequests((requests) -> requests
+                        .requestMatchers("/", "/api/auth/**").permitAll()
 
-                // Users allowed accesses
-                // Admin only accesses
-                // .requestMatchers("/").hasRole("ADMIN")
-                // Allow Static resources access
-                .requestMatchers(
-                        "/resources/**",
-                        "/images/**",
-                        "/static/**",
-                        "/css/**",
-                        "/js/**",
-                        "/images/**",
-                        "/vendor/**",
-                        "/fonts/**",
-                        "/webjars/**")
-                .authenticated()
+                        // Restrict access to POST, PUT, and DELETE methods of books to ADMIN only
+                        .requestMatchers(HttpMethod.POST, "/api/books").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.PUT, "/api/books/**").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.DELETE, "/api/books/**").hasRole("ADMIN")
 
-                // Only allow users to lend, reserve and return.
-                // .requestMatchers("/").hasRole("USER")
+                        // Allow access to GET methods of books to USER and ADMIN
+                        .requestMatchers(HttpMethod.GET, "/api/books").hasAnyRole("USER", "ADMIN")
+                        .requestMatchers(HttpMethod.GET, "/api/books/**").hasAnyRole("USER", "ADMIN")
+                        .requestMatchers(HttpMethod.GET, "/api/books/search").hasAnyRole("USER", "ADMIN")
 
-                .anyRequest().permitAll())
+                        // Allow Static resources access
+                        .requestMatchers(
+                                "/resources/**",
+                                "/images/**",
+                                "/static/**",
+                                "/css/**",
+                                "/js/**",
+                                "/images/**",
+                                "/vendor/**",
+                                "/fonts/**",
+                                "/webjars/**")
+                        .authenticated()
+
+                        .anyRequest().permitAll())
                 .formLogin((form) -> form
                         .loginPage("/login")
                         .usernameParameter("email")
