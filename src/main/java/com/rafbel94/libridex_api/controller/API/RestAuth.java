@@ -61,7 +61,6 @@ public class RestAuth {
         User user = userService.findByEmail(userLoginDTO.getEmail());
 
         String token = tokenService.getJWTToken(user.getEmail());
-        userService.updateUserToken(token, user);
 
         data.put("email", user.getEmail());
         data.put("role", user.getRole());

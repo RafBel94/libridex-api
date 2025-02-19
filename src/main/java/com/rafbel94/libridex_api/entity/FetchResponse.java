@@ -42,6 +42,6 @@ public class FetchResponse {
 
     @Override
     public String toString() {
-        return "ApiResponse [success=" + success + ", messageg=" + message + ", data=" + data + "]";
+        return "ApiResponse [success=" + success + ", message=" + message + ", data=" + data + "]";
     }
 }

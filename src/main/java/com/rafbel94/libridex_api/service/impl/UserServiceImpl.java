@@ -87,18 +87,6 @@ public class UserServiceImpl implements UserService, UserDetailsService {
     }
 
     /**
-     * Updates the user's token.
-     *
-     * @param token the new token
-     * @param user  the user whose token is to be updated
-     */
-    @Override
-    public void updateUserToken(String token, User user) {
-        user.setToken(token);
-        userRepository.save(user);
-    }
-
-    /**
      * Deletes a user by their ID.
      *
      * @param id the ID of the user to be deleted
