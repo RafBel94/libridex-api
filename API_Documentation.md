@@ -31,14 +31,14 @@ POST
 #### Possible Responses
 | Status Code | Description                     | Message                              | Data                                      |
 |-------------|---------------------------------|--------------------------------------|-------------------------------------------|
-| 200         | Login successful.               | "User logged in successfully"        | `email`, `token`                          |
+| 200         | Login successful.               | "User logged in successfully"        | `email`, `token`, `role`                          |
 | 400         | Validation errors.              | List of validation error messages    | Empty                                     |
 | 401         | Unauthorized request.           | "Unauthorized request"               | Empty                                     |
 
 ---
 
 #### Success Example
-![login success](https://i.imgur.com/M3Q80XI.png)
+![login success](https://i.imgur.com/R8wiXgW.png)
 <br>
 
 ### **Register**
@@ -277,14 +277,15 @@ GET
 ```
 
 #### Parameters
-| Name                  | Type       | Location  | Required | Description                                |
-|-----------------------|------------|-----------|----------|--------------------------------------------|
-| Authorization         | String     | Header    | Yes      | Bearer token for authentication           |
-| authors               | List       | Params    | No       | List of authors to filter by              |
-| genres                | List       | Params    | No       | List of genres to filter by               |
-| sortBy                | String     | Params    | No       | Field to sort results by                  |
-| beforePublishingDate  | String     | Params    | No       | Upper limit for publishing date filter    |
-| afterPublishingDate   | String     | Params    | No       | Lower limit for publishing date filter    |
+| Name                  | Type       | Location  | Required | Description                                      |
+|-----------------------|------------|-----------|----------|--------------------------------------------------|
+| Authorization         | String     | Header    | Yes      | Bearer token for authentication                  |
+| authors               | List       | Params    | No       | List of authors to filter by                     |
+| genres                | List       | Params    | No       | List of genres to filter by                      |
+| sortBy                | String     | Params    | No       | Field to sort results by                         |
+| beforePublishingDate  | String     | Params    | No       | Upper limit for publishing date filter           |
+| afterPublishingDate   | String     | Params    | No       | Lower limit for publishing date filter           |
+| query                 | String     | Params    | No       | Search query to filter by title, author or genre |
 
 #### Valid `sortBy` Parameters
 - `title_asc`
