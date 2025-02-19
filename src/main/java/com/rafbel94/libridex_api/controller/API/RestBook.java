@@ -17,15 +17,18 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.rafbel94.libridex_api.entity.Book;
 import com.rafbel94.libridex_api.entity.FetchResponse;
+import com.rafbel94.libridex_api.entity.User;
 import com.rafbel94.libridex_api.model.BookDTO;
 import com.rafbel94.libridex_api.model.BookUpdateDTO;
 import com.rafbel94.libridex_api.service.BookService;
+import com.rafbel94.libridex_api.service.TokenService;
 
 import jakarta.validation.Valid;
 
@@ -37,6 +40,10 @@ public class RestBook {
     @Qualifier("bookService")
     private BookService bookService;
 
+    @Autowired
+    @Qualifier("tokenService")
+    private TokenService tokenService;
+
     /**
      * Adds a new book to the system.
      *
@@ -47,7 +54,12 @@ public class RestBook {
      *         an error message if validation fails
      */
     @PostMapping
-    public ResponseEntity<FetchResponse> addBook(@Valid @RequestBody BookDTO bookDTO) {
+    public ResponseEntity<FetchResponse> addBook(@RequestHeader("Authorization") String token, @Valid @RequestBody BookDTO bookDTO) {
+        User user = tokenService.getUserFromToken(token);
+        if (!user.getRole().equals("ROLE_ADMIN")) {
+            return new ResponseEntity<>(new FetchResponse(false, List.of("Unauthorized"), new ArrayList<>()), HttpStatus.FORBIDDEN);
+        }
+
         List<Object> data = new ArrayList<>();
         List<String> messages = new ArrayList<>();
 
@@ -76,7 +88,12 @@ public class RestBook {
      *         or an error message if validation fails
      */
     @PutMapping("/{id}")
-    public ResponseEntity<FetchResponse> updateBook(@PathVariable Integer id, @Valid @RequestBody BookUpdateDTO bookUpdateDTO) {
+    public ResponseEntity<FetchResponse> updateBook(@RequestHeader("Authorization") String token, @PathVariable Integer id, @Valid @RequestBody BookUpdateDTO bookUpdateDTO) {
+        User user = tokenService.getUserFromToken(token);
+        if (!user.getRole().equals("ROLE_ADMIN")) {
+            return new ResponseEntity<>(new FetchResponse(false, List.of("Unauthorized"), new ArrayList<>()), HttpStatus.FORBIDDEN);
+        }
+
         List<Object> data = new ArrayList<>();
 
         bookUpdateDTO.setId(id);
@@ -155,7 +172,12 @@ public class RestBook {
      *         or an error message if validation fails
      */
     @DeleteMapping("/{id}")
-    public ResponseEntity<FetchResponse> deleteBook(@PathVariable Integer id) {
+    public ResponseEntity<FetchResponse> deleteBook(@RequestHeader("Authorization") String token, @PathVariable Integer id) {
+        User user = tokenService.getUserFromToken(token);
+        if (!user.getRole().equals("ROLE_ADMIN")) {
+            return new ResponseEntity<>(new FetchResponse(false, List.of("Unauthorized"), new ArrayList<>()), HttpStatus.FORBIDDEN);
+        }
+
         List<String> messages = new ArrayList<>();
         List<Object> data = new ArrayList<>();
 
