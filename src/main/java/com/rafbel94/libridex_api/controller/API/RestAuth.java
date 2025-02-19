@@ -64,6 +64,7 @@ public class RestAuth {
         userService.updateUserToken(token, user);
 
         data.put("email", user.getEmail());
+        data.put("role", user.getRole());
         data.put("token", token);
 
         AuthResponse response = new AuthResponse(true, messages, data);
