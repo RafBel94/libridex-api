@@ -18,7 +18,7 @@ public interface BookRepository extends JpaRepository<Book, Serializable> {
 
     void deleteById(Integer id);
 
-    @Query("SELECT b FROM Book b WHERE (:genres IS NULL OR b.genre IN :genres) AND (:authors IS NULL OR b.author IN :authors) AND (:beforePublishingDateParsed IS NULL OR b.publishingDate <= :beforePublishingDateParsed) AND (:afterPublishingDateParsed IS NULL OR b.publishingDate >= :afterPublishingDateParsed)")
+    @Query("SELECT b FROM Book b WHERE (:genres IS NULL OR b.genre IN :genres) AND (:authors IS NULL OR b.author IN :authors) AND (:beforePublishingDateParsed IS NULL OR b.publishingDate <= :beforePublishingDateParsed) AND (:afterPublishingDateParsed IS NULL OR b.publishingDate >= :afterPublishingDateParsed) AND (:query IS NULL OR LOWER(b.title) LIKE LOWER(CONCAT('%', :query, '%')) OR LOWER(b.author) LIKE LOWER(CONCAT('%', :query, '%')) OR LOWER(b.genre) LIKE LOWER(CONCAT('%', :query, '%')))")
     List<Book> findByFilters(List<String> genres, List<String> authors, LocalDate beforePublishingDateParsed,
-            LocalDate afterPublishingDateParsed);
+            LocalDate afterPublishingDateParsed, String query);
 }

@@ -126,7 +126,7 @@ POST
 ---
 
 #### Success Example
-![add book success]()
+![add book success](https://i.imgur.com/HCEdaMr.png)
 <br>
 
 ### **Update Book**
@@ -174,7 +174,7 @@ PUT
 ---
 
 #### Success Example
-![update book success](https://i.imgur.com/ieTAgqE.png)
+![update book success](https://i.imgur.com/0b6L1mK.png)
 <br>
 
 ### **Get All Books**
@@ -202,7 +202,7 @@ GET
 ---
 
 #### Success Example
-![get all books success](https://i.imgur.com/c9lJbtD.png)
+![get all books success](https://i.imgur.com/X3B5qSg.png)
 <br>
 
 ### **Get Book by ID**
@@ -232,7 +232,7 @@ GET
 ---
 
 #### Success Example
-![get book by id success](https://i.imgur.com/1TiDacQ.png)
+![get book by id success](https://i.imgur.com/eglh47b.png)
 <br>
 
 ### **Delete Book by ID**
@@ -262,7 +262,7 @@ DELETE
 ---
 
 #### Success Example
-![delete book by id success](https://i.imgur.com/DOyUDNx.png)
+![delete book by id success](https://i.imgur.com/Gqph4D2.png)
 <br>
 
 ### **Search Books**
@@ -318,4 +318,4 @@ afterPublishingDate -> 2023-01-01
 ---
 
 #### Success Example
-![search books success](https://i.imgur.com/FnKl5ZD.png)
+![search books success](https://i.imgur.com/Zc1485W.png)
