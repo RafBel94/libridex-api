@@ -182,6 +182,7 @@ public class RestBook {
      *                             (optional)
      * @param afterPublishingDate  the lower limit for the publishing date filter
      *                             (optional)
+     * @param query                the search query to filter by (optional)
      * @return a ResponseEntity containing the list of books that match the filters
      *         if successful, or an error message if validation fails
      */
@@ -190,7 +191,8 @@ public class RestBook {
             @RequestParam(required = false) List<String> genres,
             @RequestParam(required = false) List<String> authors, @RequestParam(required = false) String sortBy,
             @RequestParam(required = false) String beforePublishingDate,
-            @RequestParam(required = false) String afterPublishingDate) {
+            @RequestParam(required = false) String afterPublishingDate,
+            @RequestParam(required = false) String query) {
 
         List<String> messages = new ArrayList<>();
         List<Object> data = new ArrayList<>();
@@ -204,7 +206,7 @@ public class RestBook {
         }
 
         List<Book> books = bookService.findByFilters(genres, authors, sortBy, beforePublishingDate,
-                afterPublishingDate);
+                afterPublishingDate, query);
 
         for (Book book : books) {
             data.add(book);
