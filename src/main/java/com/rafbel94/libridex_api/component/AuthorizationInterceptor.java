@@ -1,13 +1,13 @@
 package com.rafbel94.libridex_api.component;
 
-
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
 import org.springframework.web.servlet.HandlerInterceptor;
 
+import com.rafbel94.libridex_api.entity.User;
 import com.rafbel94.libridex_api.service.TokenService;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -19,6 +19,9 @@ public class AuthorizationInterceptor implements HandlerInterceptor{
     @Qualifier("tokenService")
     private TokenService tokenService;
 
+    @Autowired
+    private ObjectMapper objectMapper;
+
     @SuppressWarnings("null")
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
@@ -29,9 +32,13 @@ public class AuthorizationInterceptor implements HandlerInterceptor{
 
         if (validationResponse != null) {
             response.setStatus(validationResponse.getStatusCode().value());
-            response.getWriter().write(validationResponse.getBody().toString());
+            response.setContentType("application/json");
+            response.getWriter().write(objectMapper.writeValueAsString(validationResponse.getBody()));
             return false;
         }
+
+        User user = tokenService.getUserFromToken(token);
+        request.setAttribute("user", user);
 
         return true;
     }

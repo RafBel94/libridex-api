@@ -21,5 +21,5 @@ public interface BookService {
     Book toEntity(BookUpdateDTO bookUpdateDTO);
     boolean isRequestBodyEmpty(BookUpdateDTO bookUpdateDTO);
     boolean isFindByFiltersValid(List<String> genres, List<String> authors, String sortBy, String beforePublishingDate, String afterPublishingDate, BindingResult bindingResult);
-    List<Book> findByFilters(List<String> genres, List<String> authors, String sortBy, String beforePublishingDate, String afterPublishingDate);
+    List<Book> findByFilters(List<String> genres, List<String> authors, String sortBy, String beforePublishingDate, String afterPublishingDate, String query);
 }

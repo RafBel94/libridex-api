@@ -165,14 +165,14 @@ public class BookServiceImpl implements BookService {
      */
     @Override
     public List<Book> findByFilters(List<String> genres, List<String> authors, String sortBy,
-            String beforePublishingDate, String afterPublishingDate) {
+            String beforePublishingDate, String afterPublishingDate, String query) {
 
         LocalDate beforePublishingDateParsed = beforePublishingDate != null ? LocalDate.parse(beforePublishingDate)
                 : null;
         LocalDate afterPublishingDateParsed = afterPublishingDate != null ? LocalDate.parse(afterPublishingDate) : null;
 
         List<Book> books = bookRepository.findByFilters(genres, authors, beforePublishingDateParsed,
-                afterPublishingDateParsed);
+                afterPublishingDateParsed, query);
 
         if (sortBy == null || !sortBy.matches(SORTING_REGEX)) {
             sortBy = DEFAULT_SORT;

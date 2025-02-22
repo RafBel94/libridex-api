@@ -4,6 +4,8 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
+import java.util.List;
+import java.util.ArrayList;
 
 import javax.crypto.SecretKey;
 
@@ -13,11 +15,17 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import com.rafbel94.libridex_api.service.TokenService;
+import com.rafbel94.libridex_api.entity.AuthResponse;
+import com.rafbel94.libridex_api.entity.User;
+import com.rafbel94.libridex_api.repository.UserRepository;
 
+import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.Jws;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
 import io.jsonwebtoken.security.SignatureException;
 import jakarta.annotation.PostConstruct;
+import org.springframework.beans.factory.annotation.Autowired;
 
 @Service("tokenService")
 public class TokenServiceImpl implements TokenService {
@@ -26,6 +34,9 @@ public class TokenServiceImpl implements TokenService {
     private String jwtSecretKey;
 
     private SecretKey key;
+
+    @Autowired
+    private UserRepository userRepository;
 
     /**
      * Initializes the secret key for JWT token generation and validation.
@@ -42,10 +53,13 @@ public class TokenServiceImpl implements TokenService {
      * @return a ResponseEntity containing an error message if validation fails, or null if validation is successful
      */
     @Override
-    public ResponseEntity<?> validateToken(String token) {
+    public ResponseEntity<AuthResponse> validateToken(String token) {
+        List<String> messages = new ArrayList<>();
+        Map<String, Object> data = new HashMap<>();
+
         if (token == null || !token.startsWith("Bearer ")) {
-            Map<String, Object> response = new HashMap<>();
-            response.put("error", "An authentication token is mandatory");
+            messages.add("An authentication token is mandatory");
+            AuthResponse response = new AuthResponse(false, messages, data);
             return new ResponseEntity<>(response, HttpStatus.FORBIDDEN);
         }
 
@@ -60,12 +74,12 @@ public class TokenServiceImpl implements TokenService {
             return null;
 
         } catch (SignatureException e) {
-            Map<String, Object> response = new HashMap<>();
-            response.put("error", "Invalid token");
+            messages.add("Invalid token");
+            AuthResponse response = new AuthResponse(false, messages, data);
             return new ResponseEntity<>(response, HttpStatus.UNAUTHORIZED);
         } catch (Exception e) {
-            Map<String, Object> response = new HashMap<>();
-            response.put("error", "Token validation failed");
+            messages.add("Token validation failed");
+            AuthResponse response = new AuthResponse(false, messages, data);
             return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
@@ -87,6 +101,19 @@ public class TokenServiceImpl implements TokenService {
                 .expiration(new Date(System.currentTimeMillis() + expirationTime))
                 .signWith(key)
                 .compact();
+    }
+
+    @Override
+    public User getUserFromToken(String token) {
+        String jwt = token.replace("Bearer ", "");
+        Jws<Claims> claimsJws = Jwts.parser()
+                .verifyWith(key)
+                .build()
+                .parseSignedClaims(jwt);
+
+        Claims claims = claimsJws.getPayload();
+        String email = claims.getSubject();
+        return userRepository.findByEmail(email);
     }
 
     // Is not necessary to store the returned value into a variable since

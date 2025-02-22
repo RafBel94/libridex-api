@@ -5,7 +5,7 @@
 ### **Login**
 #### URL
 ```
-https://api.example.com/api/auth/login
+https://libridex-api-8ym32.ondigitalocean.app/api/auth/login
 ```
 
 #### HTTP Method
@@ -29,22 +29,22 @@ POST
 ```
 
 #### Possible Responses
-| Status Code | Description                     |
-|-------------|---------------------------------|
-| 200         | Login successful. Returns email and JWT token.       |
-| 400         | Validation errors               |
-| 401         | Unauthorized request            |
+| Status Code | Description                     | Message                              | Data                                      |
+|-------------|---------------------------------|--------------------------------------|-------------------------------------------|
+| 200         | Login successful.               | "User logged in successfully"        | `email`, `token`, `role`                          |
+| 400         | Validation errors.              | List of validation error messages    | Empty                                     |
+| 401         | Unauthorized request.           | "Unauthorized request"               | Empty                                     |
 
 ---
 
 #### Success Example
-![login success](https://i.imgur.com/K4FDyOt.png)
+![login success](https://i.imgur.com/R8wiXgW.png)
 <br>
 
 ### **Register**
 #### URL
 ```
-https://api.example.com/api/auth/register
+https://libridex-api-8ym32.ondigitalocean.app/api/auth/register
 ```
 
 #### HTTP Method
@@ -57,7 +57,7 @@ POST
 |---------------|------------|-----------|----------|------------------------------------|
 | email         | String     | Body      | Yes      | User's email                       |
 | password      | String     | Body      | Yes      | User's password                    |
-| repeatPassword      | String     | Body      | Yes      | User's password                    |
+| repeatPassword| String     | Body      | Yes      | User's password (again)            |
 
 #### Request example
 ##### Inside body -> raw -> JSON in PostMan
@@ -65,19 +65,20 @@ POST
 {
   "email": "user@example.com",
   "password": "securepassword123",
-  "repeatPassword": "securepassword123",
+  "repeatPassword": "securepassword123"
 }
 ```
 
 #### Possible Responses
-| Status Code | Description                     |
-|-------------|---------------------------------|
-| 201         | User registered successfully      |
-| 400         | Validation errors               |
+| Status Code | Description                     | Message                              | Data                                      |
+|-------------|---------------------------------|--------------------------------------|-------------------------------------------|
+| 201         | User registered successfully.   | "User registered successfully"       | Empty                                     |
+| 400         | Validation errors.              | List of validation error messages    | Empty                                     |
+
 ---
 
 #### Success Example
-![register success](https://i.imgur.com/Zmjsz18.png)
+![register success](https://i.imgur.com/nC5G9LW.png)
 <br>
 
 ## Books Endpoints
@@ -85,7 +86,7 @@ POST
 ### **Add Book**
 #### URL
 ```
-https://api.example.com/api/books
+https://libridex-api-8ym32.ondigitalocean.app/api/books
 ```
 
 #### HTTP Method
@@ -96,7 +97,7 @@ POST
 #### Parameters
 | Name         | Type       | Location  | Required | Description                        |
 |--------------|------------|-----------|----------|------------------------------------|
-| Authorization | String     | Header    | Yes      | Bearer token for authentication   |
+| Authorization| String     | Header    | Yes      | Bearer token for authentication   |
 | title        | String     | Body      | Yes      | Book title                        |
 | author       | String     | Body      | Yes      | Book author                       |
 | genre        | String     | Body      | Yes      | Book genre                        |
@@ -116,22 +117,22 @@ POST
 ```
 
 #### Possible Responses
-| Status Code | Description                     |
-|-------------|---------------------------------|
-| 201         | Book successfully created       |
-| 400         | Validation errors               |
-| 401         | Unauthorized request            |
+| Status Code | Description                     | Message                              | Data                                      |
+|-------------|---------------------------------|--------------------------------------|-------------------------------------------|
+| 201         | Book successfully created.      | "Book created successfully"          | Details of the created book               |
+| 400         | Validation errors.              | List of validation error messages    | Empty                                     |
+| 401         | Unauthorized request.           | "Unauthorized request"               | Empty                                     |
 
 ---
 
 #### Success Example
-![add book success](https://i.imgur.com/1sg3kgA.png)
+![add book success](https://i.imgur.com/HCEdaMr.png)
 <br>
 
 ### **Update Book**
 #### URL
 ```
-https://api.example.com/api/books/{id}
+https://libridex-api-8ym32.ondigitalocean.app/api/books/{id}
 ```
 
 #### HTTP Method
@@ -163,22 +164,23 @@ PUT
 ```
 
 #### Possible Responses
-| Status Code | Description                     |
-|-------------|---------------------------------|
-| 200         | Book successfully updated       |
-| 400         | Validation errors               |
-| 401         | Unauthorized request            |
-| 404         | Book not found                  |
+| Status Code | Description                     | Message                              | Data                                      |
+|-------------|---------------------------------|--------------------------------------|-------------------------------------------|
+| 200         | Book successfully updated.      | "Book updated successfully"          | Details of the updated book               |
+| 400         | Validation errors.              | List of validation error messages    | Empty                                     |
+| 401         | Unauthorized request.           | "Unauthorized request"               | Empty                                     |
+| 404         | Book not found.                 | "Book with id {id} not found"        | Empty                                     |
 
 ---
+
 #### Success Example
-![update book success](https://i.imgur.com/ieTAgqE.png)
+![update book success](https://i.imgur.com/0b6L1mK.png)
 <br>
 
 ### **Get All Books**
 #### URL
 ```
-https://api.example.com/api/books
+https://libridex-api-8ym32.ondigitalocean.app/api/books
 ```
 
 #### HTTP Method
@@ -192,20 +194,21 @@ GET
 | Authorization | String     | Header    | Yes      | Bearer token for authentication   |
 
 #### Possible Responses
-| Status Code | Description                     |
-|-------------|---------------------------------|
-| 200         | List of books retrieved         |
-| 401         | Unauthorized request            |
+| Status Code | Description                     | Message                              | Data                                      |
+|-------------|---------------------------------|--------------------------------------|-------------------------------------------|
+| 200         | List of books retrieved.        | "Books retrieved successfully"       | List of all books                         |
+| 401         | Unauthorized request.           | "Unauthorized request"               | Empty                                     |
 
 ---
+
 #### Success Example
-![get all books success](https://i.imgur.com/c9lJbtD.png)
+![get all books success](https://i.imgur.com/X3B5qSg.png)
 <br>
 
 ### **Get Book by ID**
 #### URL
 ```
-https://api.example.com/api/books/{id}
+https://libridex-api-8ym32.ondigitalocean.app/api/books/{id}
 ```
 
 #### HTTP Method
@@ -220,21 +223,22 @@ GET
 | id            | Integer    | Path      | Yes      | ID of the book to retrieve        |
 
 #### Possible Responses
-| Status Code | Description                     |
-|-------------|---------------------------------|
-| 200         | Book details retrieved          |
-| 401         | Unauthorized request            |
-| 404         | Book not found                  |
+| Status Code | Description                     | Message                              | Data                                      |
+|-------------|---------------------------------|--------------------------------------|-------------------------------------------|
+| 200         | Book details retrieved.         | "Book retrieved successfully"        | Details of the retrieved book             |
+| 401         | Unauthorized request.           | "Unauthorized request"               | Empty                                     |
+| 404         | Book not found.                 | "Book with id {id} not found"        | Empty                                     |
 
 ---
+
 #### Success Example
-![get book by id success](https://i.imgur.com/1TiDacQ.png)
+![get book by id success](https://i.imgur.com/eglh47b.png)
 <br>
 
 ### **Delete Book by ID**
 #### URL
 ```
-https://api.example.com/api/books/{id}
+https://libridex-api-8ym32.ondigitalocean.app/api/books/{id}
 ```
 
 #### HTTP Method
@@ -249,21 +253,22 @@ DELETE
 | id            | Integer    | Path      | Yes      | ID of the book to delete          |
 
 #### Possible Responses
-| Status Code | Description                     |
-|-------------|---------------------------------|
-| 200         | Book successfully deleted       |
-| 401         | Unauthorized request            |
-| 404         | Book not found                  |
+| Status Code | Description                     | Message                              | Data                                      |
+|-------------|---------------------------------|--------------------------------------|-------------------------------------------|
+| 200         | Book successfully deleted.      | "Book deleted successfully"          | Empty                                     |
+| 401         | Unauthorized request.           | "Unauthorized request"               | Empty                                     |
+| 404         | Book not found.                 | "Book with id {id} not found"        | Empty                                     |
 
 ---
+
 #### Success Example
-![delete book by id success](https://i.imgur.com/DOyUDNx.png)
+![delete book by id success](https://i.imgur.com/Gqph4D2.png)
 <br>
 
 ### **Search Books**
 #### URL
 ```
-https://api.example.com/api/books/search
+https://libridex-api-8ym32.ondigitalocean.app/api/books/search
 ```
 
 #### HTTP Method
@@ -272,14 +277,15 @@ GET
 ```
 
 #### Parameters
-| Name                  | Type       | Location  | Required | Description                                |
-|-----------------------|------------|-----------|----------|--------------------------------------------|
-| Authorization         | String     | Header    | Yes      | Bearer token for authentication           |
-| authors               | List       | Params    | No       | List of authors to filter by              |
-| genres                | List       | Params    | No       | List of genres to filter by               |
-| sortBy                | String     | Params    | No       | Field to sort results by                  |
-| beforePublishingDate  | String     | Params    | No       | Upper limit for publishing date filter    |
-| afterPublishingDate   | String     | Params    | No       | Lower limit for publishing date filter    |
+| Name                  | Type       | Location  | Required | Description                                      |
+|-----------------------|------------|-----------|----------|--------------------------------------------------|
+| Authorization         | String     | Header    | Yes      | Bearer token for authentication                  |
+| authors               | List       | Params    | No       | List of authors to filter by                     |
+| genres                | List       | Params    | No       | List of genres to filter by                      |
+| sortBy                | String     | Params    | No       | Field to sort results by                         |
+| beforePublishingDate  | String     | Params    | No       | Upper limit for publishing date filter           |
+| afterPublishingDate   | String     | Params    | No       | Lower limit for publishing date filter           |
+| query                 | String     | Params    | No       | Search query to filter by title, author or genre |
 
 #### Valid `sortBy` Parameters
 - `title_asc`
@@ -304,12 +310,13 @@ afterPublishingDate -> 2023-01-01
 ```
 
 #### Possible Responses
-| Status Code | Description                     |
-|-------------|---------------------------------|
-| 200         | Books retrieved successfully    |
-| 401         | Unauthorized request            |
-| 400         | Invalid query parameters        |
+| Status Code | Description                     | Message                              | Data                                      |
+|-------------|---------------------------------|--------------------------------------|-------------------------------------------|
+| 200         | Books retrieved successfully.   | "Books retrieved successfully"       | List of books matching the filters        |
+| 401         | Unauthorized request.           | "Unauthorized request"               | Empty                                     |
+| 400         | Invalid query parameters.       | List of validation error messages    | Empty                                     |
 
 ---
+
 #### Success Example
-![search books success](https://i.imgur.com/FnKl5ZD.png)
+![search books success](https://i.imgur.com/Zc1485W.png)
